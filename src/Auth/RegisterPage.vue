@@ -39,6 +39,8 @@
 </template>
 
 <script>
+import axios from 'axios';
+
 export default {
   name: 'RegitserPage',
   data(){
@@ -69,16 +71,23 @@ export default {
         formData.append('email',this.email);
         formData.append('password',this.password);
         formData.append('confirmPassword', this.confirmPassword);
-        // try {
-        //     const response = await axios.post('http:/localhost:8000/api/user-store',formData,{
-        //        headers: {
-        //             'Content-Type': 'multipart/form-data',
-        //         },
-        //     });
-        //     console.log(`this is backend response: ${response.data}`)
-        // } catch (error) {
-        //     console.error('something wrong',error);
-        // }
+        try {
+            const response = await axios.post('http://127.0.0.1:8000/api/store',formData,{
+               headers: {
+                    'Content-Type': 'multipart/form-data',
+                },
+            });
+            console.log(`this is backend response: ${response.data}`);
+            if (response.data.success) {
+            // Clear input fields
+            this.name = '';
+            this.email = '';
+            this.password = '';
+            this.confirmPassword = '';
+        }
+        } catch (error) {
+            console.error('something wrong',error);
+        }
         
     },
   },

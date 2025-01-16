@@ -30,6 +30,8 @@
 </template>
 
 <script>
+import axios from 'axios';
+
 export default {
   name: 'PostPage',
   data(){
@@ -53,7 +55,7 @@ export default {
     },
    async save(e){
         e.preventDefault();
-        if(this.post || this.description  === ''){
+        if(!this.post || !this.description){
             this.validate = "All fields are required";
             window.scrollTo(0, 0); 
             return;
@@ -64,16 +66,20 @@ export default {
         if(this.postImage){
             formData.append('image',this.postImage);
         }
-        // try {
-        //     const response = await axios.post('http:/localhost:8000/api/user-store',formData,{
-        //        headers: {
-        //             'Content-Type': 'multipart/form-data',
-        //         },
-        //     });
-        //     console.log(`this is backend response: ${response.data}`)
-        // } catch (error) {
-        //     console.error('something wrong',error);
-        // }
+        try {
+            const response = await axios.post('http://127.0.0.1:8000/api/store-post',formData,{
+               headers: {
+                    'Content-Type': 'multipart/form-data',
+                },
+            });
+            console.log(`this is backend response: ${response.data}`);
+            if(response.data.status === 200){
+                this.post ='';
+                this.description = '';
+            }
+        } catch (error) {
+            console.error('something wrong',error);
+        }
         
     },
   },

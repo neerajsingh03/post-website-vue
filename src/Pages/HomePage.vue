@@ -46,10 +46,10 @@
       <router-link  to="/signup" class="btn btn-success btn-lg">Sign Up</router-link>
     </div>
   </div>
+  
 </template>
 
 <script>
-
 export default {
     name: 'HomePage',
 };

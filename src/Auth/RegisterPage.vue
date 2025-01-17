@@ -77,8 +77,7 @@
 </template>
 
 <script>
-import axios from "axios";
-
+import apiClient from '../Services/Axios.js';
 export default {
   name: "RegitserPage",
   data() {
@@ -116,7 +115,7 @@ export default {
       formData.append("password", this.password);
       formData.append("confirmPassword", this.confirmPassword);
       
-      axios.post("http://127.0.0.1:8000/api/store", formData, {
+      await apiClient.post("/store", formData, {
           headers: {
             "Content-Type": "multipart/form-data",
           },
@@ -128,7 +127,14 @@ export default {
             this.email = "";
             this.password = "";
             this.confirmPassword = "";
-            this.$router.push({ path: "/users" });
+            localStorage.setItem('token',response.data.token);
+            localStorage.setItem('role',response.data.role);
+            if (response.data.role === 'admin') {
+              this.$router.push('/admin');
+            } else {
+              this.$router.push('/user-dashboard');
+            }
+            // this.$router.push({ path: "/users" });
           }
         })
         .catch((error) => {

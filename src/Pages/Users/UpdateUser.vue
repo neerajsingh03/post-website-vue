@@ -27,7 +27,8 @@
 </template>
 
 <script>
-import axios from 'axios';
+import apiClient from '../../Services/Axios.js';
+
 
 export default {
   name: 'RegitserPage',
@@ -57,7 +58,7 @@ export default {
         formData.append('name',this.name);
         formData.append('email',this.email);
         try {
-            const response = await axios.post(`http://127.0.0.1:8000/api/update/${this.user.id}`,formData,{ 
+            const response = await apiClient.post(`/update/${this.user.id}`,formData,{ 
             });
             if (response.data.success) {
             this.name = '';
@@ -70,7 +71,7 @@ export default {
     },
    async fetchUserData(userId) {
       try {
-        const response = await axios.get(`http://127.0.0.1:8000/api/edit/${userId}`);
+        const response = await apiClient.get(`/edit/${userId}`);
         this.user = response.data.user;
         this.name =  this.user.name;
         this.email =  this.user.email;

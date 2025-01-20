@@ -27,7 +27,7 @@
 </template>
 
 <script>
-import apiClient from '../../Services/Axios.js';
+import apiClient from '@/Services/index.js';
 
 
 export default {

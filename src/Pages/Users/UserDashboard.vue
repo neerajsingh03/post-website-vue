@@ -1,50 +1,54 @@
 <template>
-  <div class="container-fluid">
-    <div class="row">
-      <div class="col-md-9 col-lg-10 p-4">
+<div class="container-fluid">
+      <main class="col-md-9 col-lg-10 ms-sm-auto p-4">
         <div class="d-flex justify-content-between align-items-center mb-4">
-          <h2>Welcome to User Dashboard</h2>
-          <button class="btn btn-danger" @click="logout">Log Out</button>
+          <h2>Welcome, User</h2>
         </div>
 
-        <div class="card">
-          <div class="card-body">
-            <h5 class="card-title">Dashboard Overview</h5>
-            <p class="card-text">Here you can manage your profile, settings, and other features of the user dashboard.</p>
-            <hr />
-            <h6>Recent Activity</h6>
-            <ul>
-              <li>Updated profile information</li>
-              <li>Posted a new update</li>
-              <li>Changed your password</li>
-            </ul>
+        <!-- Dashboard Overview -->
+        <div class="row">
+          <div class="col-md-6">
+            <div class="card shadow-sm mb-4">
+              <div class="card-body">
+                <h5 class="card-title">Profile Overview</h5>
+                <p class="card-text">Quickly manage your profile details and settings.</p>
+                <a href="#" class="btn btn-primary">Manage Profile</a>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="card shadow-sm mb-4">
+              <div class="card-body">
+                <h5 class="card-title">Recent Activity</h5>
+                <ul class="list-unstyled">
+                  <li><i class="bi bi-check-circle text-success"></i> Updated profile</li>
+                  <li><i class="bi bi-pencil-square text-primary"></i> Posted a new update</li>
+                  <li><i class="bi bi-lock text-danger"></i> Changed password</li>
+                </ul>
+              </div>
+            </div>
           </div>
         </div>
-      </div>
-    </div>
-  </div>
+
+        <!-- Additional Section -->
+        <div class="row">
+          <div class="col-md-12">
+            <div class="card shadow-sm">
+              <div class="card-body">
+                <h5 class="card-title">Notifications</h5>
+                <p class="card-text">You have no new notifications at the moment.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+</div>
 </template>
 
 <script>
-import apiClient from '../../Services/Axios.js';
 
 export default {
   name: 'UserDashboard',
-  methods: {
-    async logout() {
-      try {
-        const response = await apiClient.post('logout');
-        if (response.data.success) {
-          localStorage.removeItem('token');
-          localStorage.removeItem('role');
-          this.$router.push('/');
-        }
-      } catch (error) {
-        console.error('An error occurred during logout', error);
-        this.$router.push('/login');
-      }
-    }
-  }
 }
 </script>
 

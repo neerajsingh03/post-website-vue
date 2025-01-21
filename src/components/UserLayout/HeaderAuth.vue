@@ -24,7 +24,7 @@
             </li> -->
             <li class="nav-item mb-2">
                 <router-link to="/user-post" class="nav-link text-white">
-                    <i class="bi bi-bell"></i> Your Post
+                    <i class="bi bi-bell"></i> My Post
                 </router-link>
             </li>
             <li class="nav-item mb-2">

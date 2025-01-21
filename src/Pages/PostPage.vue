@@ -84,3 +84,9 @@ export default {
 
 };
 </script>
+
+<style scoped>
+.row.w-100 {
+    margin-bottom: -334px;
+}
+</style>

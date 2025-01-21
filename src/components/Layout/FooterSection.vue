@@ -48,4 +48,9 @@ export default {
   name: "FooterSection",
 };
 </script>
+<style scoped>
+footer.bg-dark.text-white.mt-5.py-4 {
+    margin-top: 119px !important;
+}
+</style>
 

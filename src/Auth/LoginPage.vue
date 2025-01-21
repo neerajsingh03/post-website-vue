@@ -17,11 +17,11 @@
                 </div>
 
                 <div class="d-flex justify-content-between align-items-center mb-3">
-                    <div>
+                    <!-- <div>
                         <a href="#" class="text-decoration-none">Forgot Password?</a>
-                    </div>
+                    </div> -->
                     <div>
-                        <a href="#" class="text-decoration-none">Create Account</a>
+                        <router-link to="/signup" class="text-decoration-none">Create Account</router-link>
                     </div>
                 </div>
 
@@ -74,3 +74,8 @@ export default {
     },
 };
 </script>
+<style scoped>
+.vh-100[data-v-d3a12cec] {
+    height: 53vh!important;
+}
+</style>

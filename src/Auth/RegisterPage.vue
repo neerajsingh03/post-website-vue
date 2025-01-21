@@ -114,3 +114,8 @@ export default {
     },
 };
 </script>
+<style scoped>
+.row.w-100 {
+    margin-top: 100px!important;
+}
+</style>

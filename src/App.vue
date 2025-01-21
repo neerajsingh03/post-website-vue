@@ -3,19 +3,22 @@
     <HeaderSection v-if="!$store.getters.getToken" />
     <HeaderAuth v-else />
   <router-view></router-view>
-  <!-- <FooterSection/> -->
+  <FooterSection v-if="!$store.getters.getToken" />
+  <FooterAuth  v-else />
 </template>
 
 <script>
 import HeaderSection from './components/Layout/HeaderSection.vue'
-// import FooterSection from './components/Layout/FooterSection.vue';
+import FooterSection from './components/Layout/FooterSection.vue';
 import HeaderAuth from './components/UserLayout/HeaderAuth.vue';
+import FooterAuth from './components/UserLayout/FooterAuth.vue';
 export default {
   name: 'App',
   components: {
     HeaderSection,
-    // FooterSection,
+    FooterSection,
     HeaderAuth,
+    FooterAuth,
   }
 }
 </script>

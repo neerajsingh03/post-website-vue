@@ -28,6 +28,16 @@
                 </div>
             </div>
         </div> -->
+        <div class="text-center mt-4">
+            <button class="btn btn-secondary mx-2" :disabled="pagination.current_page === 1" @click="fetchPosts(pagination.current_page - 1)">
+                Previous
+            </button>
+            <button class="btn btn-secondary mx-2" :disabled="pagination.current_page === pagination.last_page" @click="fetchPosts(pagination.current_page + 1)">
+                Next
+            </button>
+            <p>Page {{ pagination.current_page }} of {{ pagination.last_page }}</p>
+
+        </div>
     </div>
 
     <div class="text-center mt-5">
@@ -46,17 +56,28 @@ export default {
         return {
             posts: [],
             loading: true,
+            pagination: {
+                current_page: 1,
+                last_page: 1,
+            },
         };
     },
     mounted() {
         this.fetchPosts();
     },
     methods: {
-        async fetchPosts() {
-            const response = await apiClient.get('/posts');
+        async fetchPosts(page = 1) {
+            const response = await apiClient.get(`/posts?page=${page}`);
             try {
+                // if (response.data) {
+                //     this.posts = response.data.posts;
+                // }
                 if (response.data) {
-                    this.posts = response.data.posts;
+                    this.posts = response.data.posts.data; // Posts data
+                    this.pagination = {
+                        current_page: response.data.posts.current_page,
+                        last_page: response.data.posts.last_page,
+                    };
                 }
             } catch (error) {
                 console.log('posts not fetch', error);

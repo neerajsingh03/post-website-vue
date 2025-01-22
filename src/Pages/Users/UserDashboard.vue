@@ -2,7 +2,22 @@
 <div class="container-fluid">
     <main class="col-md-9 col-lg-10 ms-sm-auto p-4">
         <div class="d-flex justify-content-between align-items-center mb-4">
-            <h2>Welcome, User</h2>
+            <div class="d-flex align-items-center">
+                <div v-if="loading" class="text-center ">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                </div>
+                <!-- Profile Image -->
+                <div v-if="image" :key="image.id">
+                    <img :src="getImageUrl(image.image)" class="rounded-circle me-3" style="width: 60px; height: 60px; object-fit: cover; border: 2px solid #ddd;" />
+                </div>
+                <div>
+                    <h2 class="mb-0" style="font-size: 1.5rem;">Welcome, {{ userName ? userName.name.split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ') : 'guest' }}</h2>
+
+                    <small class="text-muted" v-if="lastLogin">Last login: {{ lastLoginTime }}</small>
+                </div>
+            </div>
         </div>
 
         <!-- Dashboard Overview -->
@@ -21,7 +36,7 @@
                     <div class="card-body">
                         <h5 class="card-title">Recent Activity</h5>
                         <ul class="list-unstyled">
-                            <li><i class="bi bi-check-circle text-success"></i> Updated profile</li>
+                            <li @click="handleUpdateProfile" class="up-pf"><i class="bi bi-check-circle text-success"></i> Updated profile</li>
                             <li><i class="bi bi-pencil-square text-primary"></i> Posted a new update</li>
                             <li @click="handleChangePassword" class="change-passord"><i class="bi bi-lock text-danger"></i> Changed password</li>
                         </ul>
@@ -79,6 +94,42 @@
             </div>
         </div>
     </div>
+    <!-- end change password model -->
+
+    <!-- Update Profile Model -->
+    <div class="modal fade" id="updateProfileModal" tabindex="-1" aria-labelledby="updateProfileModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <!-- Modal Header -->
+                <div class="modal-header">
+                    <h5 class="modal-title" id="updateProfileModalLabel">Update Profile Picture</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+
+                <!-- Modal Body -->
+                <div class="modal-body">
+                    <form @submit.prevent="submitUpdateProfile">
+                        <!-- Profile Picture Upload -->
+                        <div class="mb-3 text-center">
+                            <label for="profileImage" class="form-label">Upload Profile Picture</label>
+                            <div class="d-flex justify-content-center mb-3">
+                                <!-- Image Preview (Optional) -->
+                                <!-- <img v-if="profileImagePreview" :src="profileImagePreview" alt="Profile Preview" class="img-thumbnail rounded-circle" style="width: 100px; height: 100px; object-fit: cover;"> -->
+                            </div>
+                            <input type="file" class="form-control" id="profileImage" @change="handleFileChange">
+                        </div>
+
+                        <!-- Submit Button -->
+                        <!-- <button type="submit" class="btn btn-primary w-100">
+                            Update Profile
+                        </button> -->
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- End Update Profile Model -->
 </div>
 </template>
 
@@ -88,8 +139,7 @@ import {
     Modal
 } from "bootstrap";
 import apiClient from '@/Services';
-// import apiClient from '@/Services';
-
+import store from '@/Store/index';
 export default {
     name: "UserDashboard",
     data() {
@@ -99,7 +149,22 @@ export default {
                 newPassword: "",
                 confirmPassword: "",
             },
+            profileImage: "",
+            image: '',
+            loading: true,
+            userName: '',
+            lastLogin: '',
         };
+    },
+    computed: {
+
+        lastLoginTime() {
+            return this.timeAgo(this.lastLogin);
+        }
+    },
+    mounted() {
+        const id = store.getters.getUserId;
+        this.fetchUser(id);
     },
     methods: {
         handleChangePassword() {
@@ -120,8 +185,7 @@ export default {
             try {
                 const response = await apiClient.post('/change-password', this.form);
                 console.log(response.data);
-                if(response.data && response.data.success)
-                {
+                if (response.data && response.data.success) {
                     alert(response.data.success);
                 }
             } catch (error) {
@@ -145,6 +209,70 @@ export default {
             this.form.newPassword = "";
             this.form.confirmPassword = "";
         },
+        handleUpdateProfile() {
+            const modal = new Modal(document.getElementById("updateProfileModal"));
+            modal.show();
+
+        },
+        async handleFileChange(e) {
+            const id = store.getters.getUserId;
+            const file = e.target.files[0];
+            if (file) {
+                this.profileImage = file;
+            }
+            if (this.profileImage) {
+                const formData = new FormData();
+                formData.append('image', this.profileImage);
+                formData.append('id', id);
+                try {
+                    const response = await apiClient.post('/update', formData, {
+                        headers: {
+                            'Content-Type': 'multipart/form-data',
+                        },
+                    });
+                    if (response.data && response.data.success) {
+                        await this.fetchUser(id);
+                        console.log('Profile updated successfully:', response.data);
+                        this.loading = false;
+                        const modal = Modal.getInstance(document.getElementById("updateProfileModal"));
+                        modal.hide();
+                      
+                    }
+
+                } catch (error) {
+                    console.error('Error updating profile:', error);
+                }
+            }
+        },
+        timeAgo(lastLogin) {
+            if (!lastLogin) return "Never logged in";
+            const currentTime = new Date();
+            const lastLoginTime = new Date(`${lastLogin} UTC`);
+            const timeDifference = currentTime - lastLoginTime;
+            const seconds = Math.floor(timeDifference / 1000);
+            const minutes = Math.floor(seconds / 60);
+            const hours = Math.floor(minutes / 60);
+
+            if (hours > 0) {
+                return `${hours} hour${hours === 1 ? '' : 's'} ago`;
+            } else if (minutes > 0) {
+                return `${minutes} minute${minutes === 1 ? '' : 's'} ago`;
+            } else {
+                return `${seconds} second${seconds === 1 ? '' : 's'} ago`;
+            }
+        },
+        async fetchUser(id) {
+            const userProfile = await apiClient.get(`/users/${id}`);
+            if (userProfile.data && userProfile.data.users) {
+                this.image = userProfile.data.users;
+                this.userName = userProfile.data.users;
+                this.lastLogin = userProfile.data.users.last_login;
+                this.loading = false;
+            }
+        },
+        getImageUrl(imagePath) {
+            return `http://127.0.0.1:8000/${imagePath}`;
+        },
     },
 };
 </script>
@@ -161,10 +289,28 @@ export default {
 .modal-content {
     margin-top: 96px !important;
 }
+
 li.change-passord {
     cursor: pointer;
 }
+
 main.col-md-9.col-lg-10.ms-sm-auto.p-4 {
     margin-bottom: -242px;
+}
+
+img.rounded-circle {
+    transition: transform 0.3s ease-in-out;
+}
+
+img.rounded-circle:hover {
+    transform: scale(1.1);
+}
+
+li.up-pf {
+    cursor: pointer;
+}
+.modal-content[data-v-c5acb9e4][data-v-c5acb9e4] {
+    margin-top: 90px !important;
+    margin-bottom: 446px;
 }
 </style>
